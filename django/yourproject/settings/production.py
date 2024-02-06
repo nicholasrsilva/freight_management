@@ -9,5 +9,5 @@ ALLOWED_HOSTS = ['yourproject.example.com']
 DATABASES = {
     'default': dj_database_url.config()
 }
-STATIC_ROOT= '/home/ubuntu/freight_management/django/static'
+STATIC_ROOT= '/home/ubuntu/static'
 #STATIC_ROOT = os.environ.get('STATIC_ROOT')
