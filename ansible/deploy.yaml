@@ -5,7 +5,7 @@
   gather_facts: no
 
   tasks:
-  - name: pull branch master
+  - name: pull branch main
     git:
       repo={{ repo_url }}/{{ repo }}.git
       dest={{ repo_dir }}
@@ -15,8 +15,11 @@
   gather_facts: no
   tasks:
   - name: install python requirements
-    pip: requirements={{ repo_dir }}/requirements/production.txt extra_args=--upgrade
-
+    pip: 
+        #executable: /home/ubuntu/venv/bin/python3
+        requirements: "{{ repo_dir }}/requirements/production.txt"
+        extra_args: --upgrade
+        state: present
 - hosts: all
   become: yes
   become_user: ubuntu

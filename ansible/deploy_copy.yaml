@@ -1,0 +1,82 @@
+---
+- hosts: all
+  become: yes
+  become_user: ubuntu
+  gather_facts: no
+
+  tasks:
+    - name: pull branch main
+      git:
+        repo: "{{ repo_url }}/{{ repo }}.git"
+        dest: "{{ repo_dir }}"
+        accept_hostkey: yes
+
+    - name: Create Python virtual environment
+      command: python -m venv /home/ubuntu/venv
+      args:
+        creates: /home/ubuntu/venv
+
+- hosts: all
+  become: yes
+  become_user: ubuntu
+  gather_facts: no
+
+  tasks:
+    - name: Activate virtual environment and install requirements
+      #shell: source /home/ubuntu/venv/bin/activate
+      shell: /home/ubuntu/venv/bin/python /home/ubuntu/venv/bin/pip install -r {{ repo_dir }}/requirements/production.txt --upgrade
+  
+    #- name: Install requirements
+    #  shell: pip install -r {{ repo_dir }}/requirements/production.txt --upgrade
+
+    #- name: Install Python requirements
+    #  pip:
+    #    executable: /home/ubuntu/venv/bin/python
+    #    requirements: "{{ repo_dir }}/requirements/production.txt"
+    #    extra_args: --upgrade
+    #    state: present
+
+- hosts: all
+  become: yes
+  become_user: ubuntu
+  gather_facts: no
+  environment:
+    DJANGO_SETTINGS_MODULE: "{{ django_project }}.settings.production"
+    DATABASE_URL: postgres://{{ dbuser }}:{{ dbpassword }}@localhost/{{ dbname }}"
+    STATIC_ROOT: "{{ static_dir }}"
+
+  tasks:
+    - name: create static_root dir
+      file:
+        path: "{{ static_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: django collectstatic
+      django_manage:
+        command: /home/ubuntu/venv/bin/python /home/ubuntu/freight_management/django ./manage.py collectstatic --noinput
+        app_path: "{{ django_dir }}"
+# args:
+#  chdir: "{{ django_dir }}"
+
+    - name: django migrate
+      django_manage:
+        command: /home/ubuntu/venv/bin/python /home/ubuntu/freight_management/django ./manage.py migrate --noinput
+        app_path: "{{ django_dir }}"      
+#args:
+#chdir: "{{ django_dir }}"
+    - name: django loaddata
+      django_manage:
+       command: ./manage.py loaddata user
+       app_path: "{{ django_dir }}"
+     #args:
+      #  chdir: "{{ django_dir }}"
+
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: uwsgi restart
+      service:
+        name: uwsgi
+        state: restarted
+
