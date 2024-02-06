@@ -10,4 +10,4 @@ DATABASES = {
     'default': dj_database_url.config()
 }
 
-STATIC_ROOT = environ['STATIC_ROOT']
+STATIC_ROOT = os.environ.get(['STATIC_ROOT'])
