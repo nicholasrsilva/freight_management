@@ -15,7 +15,6 @@
       command: python -m venv /home/ubuntu/venv
       args:
         creates: /home/ubuntu/venv
-
 - hosts: all
   become: yes
   become_user: ubuntu
@@ -24,8 +23,8 @@
   tasks:
     - name: Activate virtual environment and install requirements
       #shell: source /home/ubuntu/venv/bin/activate
-      shell: /home/ubuntu/venv/bin/python /home/ubuntu/venv/bin/pip install -r {{ repo_dir }}/requirements/production.txt --upgrade
-  
+      shell: /home/ubuntu/venv/bin/python3 /home/ubuntu/venv/bin/pip install -r {{ repo_dir }}/requirements/production.txt --upgrade
+
     #- name: Install requirements
     #  shell: pip install -r {{ repo_dir }}/requirements/production.txt --upgrade
 
@@ -46,6 +45,10 @@
     STATIC_ROOT: "{{ static_dir }}"
 
   tasks:
+    - name: see variables
+      debug:
+        msg: "home_dir path is {{ home_dir }} and static_dir is {{ static_dir }} django dir is {{django_dir}} and env is {{venv_dir}} "
+
     - name: create static_root dir
       file:
         path: "{{ static_dir }}"
@@ -53,16 +56,20 @@
         mode: "0755"
 
     - name: django collectstatic
+      #django_manage:
+    #    command: /home/ubuntu/venv/bin/python3 /home/ubuntu/freight_management/django ./manage.py collectstatic --noinput
+    #    app_path: "{{ django_dir }}"
       django_manage:
-        command: /home/ubuntu/venv/bin/python /home/ubuntu/freight_management/django ./manage.py collectstatic --noinput
+        command: collectstatic --noinput
         app_path: "{{ django_dir }}"
+        virtualenv: "{{ venv_dir }}"
 # args:
 #  chdir: "{{ django_dir }}"
 
     - name: django migrate
       django_manage:
-        command: /home/ubuntu/venv/bin/python /home/ubuntu/freight_management/django ./manage.py migrate --noinput
-        app_path: "{{ django_dir }}"      
+        command: /home/ubuntu/venv/bin/python3 /home/ubuntu/freight_management/django ./manage.py migrate --noinput
+        app_path: "{{ django_dir }}"
 #args:
 #chdir: "{{ django_dir }}"
     - name: django loaddata
@@ -79,4 +86,3 @@
       service:
         name: uwsgi
         state: restarted
-

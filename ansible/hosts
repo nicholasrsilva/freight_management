@@ -5,6 +5,7 @@ all:
         repo_url: git@github.com:nicholasrsilva
         repo: freight_management
         home_dir: /home/ubuntu
+        venv_dir: /home/ubuntu/venv
         repo_dir: "{{ home_dir }}/{{ repo }}"
         django_dir: "{{ repo_dir }}/django"
         static_dir: "{{ home_dir }}/static"
