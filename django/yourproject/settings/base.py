@@ -79,7 +79,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    root('static')
-]
-
+# STATICFILES_DIRS = [
+#     root('static')
+# ]
+STATIC_ROOT= '/home/ubuntu/static'
