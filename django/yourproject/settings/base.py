@@ -22,7 +22,7 @@ root = lambda *x: join(abspath(PROJECT_ROOT), *x)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'change this to something secret'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['159.65.240.214']
 
 # Application definition
 
